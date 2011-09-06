@@ -42,10 +42,10 @@ public class Song
 		lastChange = System.currentTimeMillis();
 		votes.clear();
 	}
-	public long getLastChange()
+	/*public long getLastChange() TODO: give the latest time of change to the database.
 	{
 		return lastChange();
-	}	
+	}*/	
 	public String getTitle()
 	{
 		return title;

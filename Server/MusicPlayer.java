@@ -30,7 +30,7 @@ public class MusicPlayer implements Runnable
 			nowPlaying = JukeBoxServer.fileDatabase.getHighestSong();
 			while (nowPlaying == null) nowPlaying = JukeBoxServer.fileDatabase.getHighestSong();
 			String filename = nowPlaying.getFilename();
-			System.out.println("Will try to play"+filename);
+			//System.out.println("Will try to play"+filename);
 			try{				
 				File f = new File("uploads/"+filename);
 				URL theURL = f.toURI().toURL();
@@ -67,7 +67,7 @@ public class MusicPlayer implements Runnable
 					player.play();
 					
 				//}
-				System.out.println("Done playing");
+				//System.out.println("Done playing");
 				//while (!player.isComplete())
 				nowPlaying.clearVotes();
 				JukeBoxServer.fileDatabase.postUpdate();

@@ -135,11 +135,13 @@ public class MusicPlayer implements Runnable
 			return;
 		//player.start();
 	}
-//	public synchronized void addToQueue(Song song)
-//	{
-//		toPlay.add(song);
-//		song.voteFor();
-//	}
+
+	/*public synchronized void addToQueue(Song song)
+	{
+		toPlay.add(song);
+		song.voteFor();
+	}*/
+
 	public synchronized String nowPlaying()
 	{
 		if (nowPlaying!=null)

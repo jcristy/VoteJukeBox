@@ -24,6 +24,7 @@ public class JukeBoxClient
 	public static JTextField server_address_tf;
 	public static JLabel now_playing_lbl;
 	public static JSeparator separator;
+		public static JScrollPane database_song_table_scrollpane;
 		public static JPanel database_song_table;
 		
 		public static JPanel upload_song_panel;
@@ -70,12 +71,12 @@ public class JukeBoxClient
 		{
 			mainframe = new JFrame("VoteBox Client");
 			server_address_lbl = new JLabel("Server address:");
-			server_address_tf = new JTextField("192.168.0.7");
+			server_address_tf = new JTextField("192.168.137.59");
 			now_playing_lbl = new JLabel("Now Playing");
 			separator = new JSeparator();
 		
 			database_song_table = new JPanel();
-			GridLayout bl_database_table = new GridLayout(10,5);
+			GridLayout bl_database_table = new GridLayout(10,0);
 			database_song_table.setLayout(bl_database_table);
 			for (int i=0; i<8; i++);	
 				database_song_table.add(new JButton("You Shouldn't See This"));
@@ -118,7 +119,8 @@ public class JukeBoxClient
 			contentpane.add(server_address_tf);
 			contentpane.add(now_playing_lbl);
 			contentpane.add(separator);
-			contentpane.add(new JScrollPane(database_song_table,ScrollPaneConstants.VERTICAL_SCROLLBAR_NEVER,ScrollPaneConstants.HORIZONTAL_SCROLLBAR_ALWAYS));
+			database_song_table_scrollpane = new JScrollPane(database_song_table,ScrollPaneConstants.VERTICAL_SCROLLBAR_NEVER,ScrollPaneConstants.HORIZONTAL_SCROLLBAR_ALWAYS);
+			contentpane.add(database_song_table_scrollpane);
 			contentpane.add(separator);
 			contentpane.add(upload_song_header_lbl);
 			contentpane.add(send_song_btn);
@@ -166,7 +168,14 @@ public class JukeBoxClient
 				String inputLine = "";
 				while (!in.ready());
 				inputLine = in.readLine();
-				now_playing_lbl.setText(inputLine);
+				if ( database!=null)
+				{
+					now_playing_lbl.setText(inputLine);
+				}
+				else
+				{
+					System.out.println("Now Playing: "+inputLine);
+				}
 				inputLine = in.readLine();
 				while (!inputLine.contains("<END>"))
 				{
@@ -197,7 +206,7 @@ public class JukeBoxClient
 				}
 				
 			}catch(Exception e){e.printStackTrace();}
-			if (database!=null) database.invalidate();
+			if (database!=null) database.validate();
 		}
 	}
 	public static class Voter implements Runnable
@@ -317,7 +326,7 @@ public class JukeBoxClient
 						panel.add(progress);
 						progress.setValue(0);
 						progress.setString("Server has Maximum Connections, Please Wait");
-						//mainframe.pack();
+						mainframe.validate();
 					}
 					else
 					{
@@ -344,7 +353,7 @@ public class JukeBoxClient
 							{
 								progress.setValue(Integer.parseInt(status.substring(0,status.indexOf(' '))));
 								progress.setString(f.getName()+" "+status.substring(status.indexOf(')')+1));
-								//if (firsttime) mainframe.pack();
+								if (firsttime) mainframe.validate();
 								firsttime=false;
 							}
 						}
@@ -363,7 +372,7 @@ public class JukeBoxClient
 						public void mouseReleased (MouseEvent e){};
 						public void mouseExited (MouseEvent e){};
 					});
-						//mainframe.pack();
+						mainframe.validate();
 					}
 					
 				}
@@ -384,7 +393,7 @@ public class JukeBoxClient
 							public void mouseExited (MouseEvent e){};
 						});
 						panel.add(info);
-						//mainframe.pack();
+						mainframe.validate();
 					}
 				}			
 				//NOW SEND THE BYTES OF THE FILE

@@ -1,0 +1,6 @@
+Server/*.class
+Server/*.jar
+*.class
+Client/*.class
+Client/*.jar
+Server/uploads/

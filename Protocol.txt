@@ -1,0 +1,28 @@
+This file describes the protocol for communication with the server
+<> variable, otherwise literal
+| concurrent
+| communication
+
+Client: <USERNAME>
+Client: <ACTION>
+ACTION = { GETSONGS, VOTEFOR, NOMINATE}
+=====if GETSONGS=====
+Server: <NOW PLAYING>
+Server: <FILENAME> <VOTES>
+...repeats for all files in database
+
+=====if VOTEFOR======
+Client: <FILENAME>
+Server: <FILENAME> <VOTES>
+
+=====if NOMINATE=====
+Client: <FILENAME>
+Server: {WAIT, SENDFILE, GOTIT}
+
+	=if WAIT=========
+	Server: SENDFILE
+	=if SENDFILE
+	Client: <File Size in Bytes>
+|	Client: <File Contents>
+|   Server: <Percentage> % (<bytes>) rate:<rate> KiB/s Time Remaining <mm:ss>
+	Server: Received <Filename> in <delta> s

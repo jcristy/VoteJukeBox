@@ -1,6 +1,7 @@
 import org.jaudiotagger.audio.mp3.*;
 import org.jaudiotagger.audio.*;
 import org.jaudiotagger.audio.exceptions.*;
+import org.jaudiotagger.audio.exceptions.CannotReadException;
 import org.jaudiotagger.tag.*;
 import org.jaudiotagger.tag.id3.*;
 
@@ -29,7 +30,7 @@ public class TagReader {
 	TagReader(File inputFile){
 		filename = inputFile.getName();
 		try{
-			attempted_read = false;
+			attempted_read = true;
 			mp3_file = (MP3File)AudioFileIO.read(inputFile);	
 		}
 		catch(IOException e){
@@ -62,7 +63,7 @@ public class TagReader {
 	
 	public void readFile(File inputFile){
 		try{
-			attempted_read = false;
+			attempted_read = true;
 			mp3_file = (MP3File)AudioFileIO.read(inputFile);	
 		}
 		catch(IOException e){
@@ -102,11 +103,16 @@ public class TagReader {
 	
 	public String getArtist(){
 		if(tagsValid()){
-			if(has_v2_tag){
-				return tag_v2.getFirst(ID3v24Frames.FRAME_ID_ARTIST);
+			if(tagHasArtistTitle()){
+				if(has_v2_tag){
+					return tag_v2.getFirst(ID3v24Frames.FRAME_ID_ARTIST);
+				}
+				else{
+					return tag_v1.getArtist().get(0).toString();
+				}
 			}
 			else{
-				return tag_v1.getArtist().get(0).toString();
+				return "";
 			}
 		}
 		else{
@@ -116,11 +122,16 @@ public class TagReader {
 	
 	public String getTitle(){
 		if(tagsValid()){
-			if(has_v2_tag){
-				return tag_v2.getFirst(ID3v24Frames.FRAME_ID_TITLE);
+			if(tagHasArtistTitle()){
+				if(has_v2_tag){
+					return tag_v2.getFirst(ID3v24Frames.FRAME_ID_TITLE);
+				}
+				else{
+					return tag_v1.getFirstTitle();
+				}
 			}
 			else{
-				return tag_v1.getFirstTitle();
+				return filename;
 			}
 		}
 		else{
@@ -130,11 +141,16 @@ public class TagReader {
 	
 	public String getAlbum(){
 		if(tagsValid()){
-			if(has_v2_tag){
-				return tag_v2.getFirst(ID3v24Frames.FRAME_ID_ALBUM);
+			if(tagHasArtistTitle()){
+				if(has_v2_tag){
+					return tag_v2.getFirst(ID3v24Frames.FRAME_ID_ALBUM);
+				}
+				else{
+					return tag_v1.getAlbum().get(0).toString();
+				}
 			}
 			else{
-				return tag_v1.getAlbum().get(0).toString();
+				return "";
 			}
 		}
 		else{
@@ -142,17 +158,52 @@ public class TagReader {
 		}
 	}
 	
-	//Initialize Tag
+	public String printArtistTitle(){
+		if(tagHasArtistTitle()){
+			return getArtist()+getTitle();
+		}
+		else{
+			return getTitle();
+		}
+	}
+	//Only do if you have checked that the tags are valid
+	private boolean tagHasArtistTitle(){
+		int version = checkTagVersion();
+		if(version == 1){
+			if(tag_v1.getArtist().get(0).toString().equals("") && tag_v1.getFirstTitle().equals("")){
+				return false;
+			}
+			else{
+				return true;
+			}
+		}
+		else if(version == 2){
+			if(tag_v2.getFirst(ID3v24Frames.FRAME_ID_ARTIST).equals("") && 
+					tag_v2.getFirst(ID3v24Frames.FRAME_ID_TITLE).equals("")){
+				return false;
+			}
+			else{
+				return true;
+			}
+		}
+		else{
+			return false;
+		}
+	}
+	
+	//Initialize Tag - sets good_tags to true if successful
 	private void makeTag(){
 		short version = checkTagVersion();
-		
+		System.out.println("Tag Version: " + version);
 		if(version == 1){
 			tag_v1 = (ID3v1Tag)mp3_file.getTag();
 			has_v2_tag = false;
+			good_tags = true;
 		}
 		else if (version == 2){
 			tag_v2 = mp3_file.getID3v2TagAsv24();
 			has_v2_tag = true;
+			good_tags = true;
 		}
 		else{
 			System.out.println("invalid version");
@@ -161,7 +212,7 @@ public class TagReader {
 	}
 	
 	private short checkTagVersion(){
-		if(mp3_file.hasID3v1Tag()){
+		if(mp3_file.hasID3v1Tag() && !mp3_file.hasID3v2Tag()){
 			return 1; 
 		}
 		else if(mp3_file.hasID3v2Tag()){
@@ -172,4 +223,48 @@ public class TagReader {
 		}
 	}
 	
+	
+	/* Testing Main
+	public static void main(String argv[]){
+		System.out.println("TagReader Test");
+		
+		File test1 = new File("/Users/kelsongent/Downloads/02 - Hearts On Fire.mp3");
+		File test2 = new File("/Users/kelsongent/Downloads/war_room.mp3");
+		
+		TagReader readerTest1 = new TagReader(test1);
+		TagReader readerTest2 = new TagReader(test2);
+		
+		if(readerTest1.isSetup() && readerTest1.tagsValid()){
+			System.out.println("Test 1 Information");
+			System.out.println("Other: " + readerTest2.tag_v2.getFieldCount());
+			System.out.println("Artist: " + readerTest1.getArtist());
+			System.out.println("Title: " + readerTest1.getTitle());
+			System.out.println("Album: " + readerTest1.getAlbum());
+		}
+		else if(readerTest1.isSetup()){
+			System.out.println("Test 1 Information");
+			System.out.println("No Tags");
+			System.out.println("Filename: " + readerTest2.getTitle());
+		}
+		else{
+			System.out.println("NOT INITIALIZED");
+		}
+		
+		if(readerTest2.isSetup() && readerTest2.tagsValid()){
+			System.out.println("Test 2 Information");
+			System.out.println("Other: " + readerTest2.tag_v2.getFieldCount());
+			System.out.println("Artist: " + readerTest2.getArtist());
+			System.out.println("Title: " + readerTest2.getTitle());
+			System.out.println("Album: " + readerTest2.getAlbum());
+		}
+		else if(readerTest2.isSetup()){
+			System.out.println("Test 2 Information");
+			System.out.println("No Tags");
+			System.out.println("Filename: " + readerTest2.getTitle());
+		}
+		else{
+			System.out.println("NOT INITIALIZED");
+		}
+	}
+	*/
 }

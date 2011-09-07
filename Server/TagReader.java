@@ -158,9 +158,9 @@ public class TagReader {
 		}
 	}
 	
-	public String printArtistTitle(){
+	public String getArtistTitleName(){
 		if(tagHasArtistTitle()){
-			return getArtist()+getTitle();
+			return getArtist()+ " - " + getTitle();
 		}
 		else{
 			return getTitle();
@@ -169,6 +169,9 @@ public class TagReader {
 	//Only do if you have checked that the tags are valid
 	private boolean tagHasArtistTitle(){
 		int version = checkTagVersion();
+		if(!tagsValid()){
+			return false;
+		}
 		if(version == 1){
 			if(tag_v1.getArtist().get(0).toString().equals("") && tag_v1.getFirstTitle().equals("")){
 				return false;

@@ -8,7 +8,7 @@ Client: <ACTION>
 ACTION = { GETSONGS, VOTEFOR, NOMINATE}
 =====if GETSONGS=====
 Server: <NOW PLAYING>
-Server: <FILENAME> <VOTES>
+Server: '<filename>'<filename>'</filename>' '<artist>'<artist>'</artist>' '<title>'<title>'</title>'  '<votes>'<votes>'</votes>
 ...repeats for all files in database
 
 =====if VOTEFOR======

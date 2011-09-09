@@ -153,9 +153,9 @@ public class JukeBoxMessageHandler implements Runnable
 					{
 						finishConnection();
 					}
-					//MP3File mp3 = new MP3File(f);
-					//mp3.getID3v1Tag().getTitle();
-					JukeBoxServer.fileDatabase.addSong(new Song(Filename,username," "," "));
+					TagReader tr = new TagReader(f);
+					
+					JukeBoxServer.fileDatabase.addSong(new Song(Filename,username,tr.getArtist(),tr.getTitle()));
 					JukeBoxServer.fileDatabase.voteFor(Filename,IPAddress);
 				}
 

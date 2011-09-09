@@ -54,4 +54,8 @@ public class Song
 	{
 		return filename;
 	}
+	public String getArtist()
+	{
+		return artist;	
+	}
 }

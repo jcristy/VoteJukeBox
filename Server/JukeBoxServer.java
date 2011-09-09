@@ -37,7 +37,10 @@ public class JukeBoxServer
 				File[] files = dir.listFiles(filter);
 				for (int i=0; i<files.length; i++)
 				{
-					fileDatabase.addSong(new Song(files[i].getName(),"","",""));
+					//fileDatabase.addSong(new Song(files[i].getName(),"","",""));
+					
+					TagReader tr = new TagReader(files[i]);
+					JukeBoxServer.fileDatabase.addSong(new Song(files[i].getName(),"",tr.getArtist(),tr.getTitle()));
 				}
 			}
 		});

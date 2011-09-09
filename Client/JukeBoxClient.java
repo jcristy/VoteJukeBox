@@ -4,7 +4,7 @@
 import java.net.*;
 import java.io.*;
 import javax.swing.*;
-import javax.swing.filechooser.FileNameExtensionFilter;
+//import javax.swing.filechooser.FileNameExtensionFilter;
 import java.awt.event.*;
 import java.awt.Container;
 import java.awt.FlowLayout;
@@ -71,7 +71,7 @@ public class JukeBoxClient
 		{
 			mainframe = new JFrame("VoteBox Client");
 			server_address_lbl = new JLabel("Server address:");
-			server_address_tf = new JTextField("192.168.137.59");
+			server_address_tf = new JTextField("172.31.53.101");
 			now_playing_lbl = new JLabel("Now Playing");
 			separator = new JSeparator();
 		
@@ -179,10 +179,13 @@ public class JukeBoxClient
 				inputLine = in.readLine();
 				while (!inputLine.contains("<END>"))
 				{
-					
+					String artist = getValueFromXML("artist",inputLine);
+					String title  = getValueFromXML("title",inputLine);
+					String filename = getValueFromXML("filename",inputLine);
+					String votes = getValueFromXML("votes",inputLine);
 					if (database!=null)
 					{
-						final JButton voteFor = new JButton("Vote For "+inputLine);
+						final JButton voteFor = new JButton(title+" by "+artist+"("+votes+")");
 						database.add(voteFor);
 						voteFor.addActionListener(new ActionListener(){
 						public void actionPerformed(ActionEvent e)
@@ -197,7 +200,7 @@ public class JukeBoxClient
 					}
 					else
 					{
-						System.out.println(inputLine);
+						System.out.println(title+" by "+artist+" in "+filename);
 					}
 					while (!in.ready());
 					inputLine = in.readLine();
@@ -208,7 +211,16 @@ public class JukeBoxClient
 			}catch(Exception e){e.printStackTrace();}
 			if (database!=null) database.validate();
 		}
+		public String getValueFromXML(String tag, String xml)
+		{
+			int begin;
+			int end;
+			begin = xml.indexOf("<"+tag+">")+tag.length()+2;
+			end   = xml.indexOf("</"+tag+">");
+			return xml.substring(begin,end);
+		}
 	}
+	
 	public static class Voter implements Runnable
 	{
 		String filename;

@@ -58,14 +58,21 @@ public class JukeBoxDatabase
 	{
 		for (int i=0; i<Songs.size();i++)
 		{
-			System.out.println(Songs.get(i).getFilename()+" "+Songs.get(i).getVotes());
+			System.out.println(Songs.get(i).getFilename()+" votes:"+Songs.get(i).getVotes()+" title:"+Songs.get(i).getTitle()+" artist:"+Songs.get(i).getArtist());
 		}
 	}
 	public void printSongs(PrintWriter out)
 	{
 		for (int i=0; i<Songs.size();i++)
 		{
-			out.println(Songs.get(i).getFilename()+" "+Songs.get(i).getVotes());
+			//out.println(Songs.get(i).getFilename()+" "+Songs.get(i).getVotes());
+			out.print("<song>");
+			out.print("<filename>"+Songs.get(i).getFilename()+"</filename>");
+			out.print("<artist>"+Songs.get(i).getArtist()+"</artist>");
+			out.print("<title>"+Songs.get(i).getTitle()+"</title>");
+			out.print("<votes>"+Songs.get(i).getVotes()+"</votes>");
+			out.print("</song>");
+			out.println();
 		}
 	}
 	public int voteFor(String filename,String IPAddress)

@@ -45,7 +45,12 @@ public class JukeBoxMessageHandler implements Runnable
 			if (inputLine.equals(GETSONGS))
 			{
 				JukeBoxServer.pinged(IPAddress);
-				os.println(JukeBoxServer.mp.nowPlaying.getFilename());
+				os.println("<filename>"+JukeBoxServer.mp.nowPlaying.getFilename()+"</filename>"
+				+"<artist>"+JukeBoxServer.mp.nowPlaying.getArtist()+"</artist>"
+				+"<title>"+JukeBoxServer.mp.nowPlaying.getTitle()+"</title>"
+				+"<vetoes>"+JukeBoxServer.vetos.size()+"</vetoes>"
+				+"<users>"+JukeBoxServer.unique.size()+"</users>"
+				+"<votes>"+JukeBoxServer.mp.nowPlaying.getVotes()+"</votes>");
 				JukeBoxServer.fileDatabase.printSongs(os);
 				os.println("<END>");
 			}
@@ -54,7 +59,7 @@ public class JukeBoxMessageHandler implements Runnable
 				inputLine = JukeBoxServer.readALine(bis);
 				//System.out.println("VOTEFOR    "+inputLine);
 				if (inputLine.equals("VETO"))
-					JukeBoxServer.veto(IPAddress);	
+					os.println("VETO "+JukeBoxServer.veto(IPAddress));
 				else
 					os.println(inputLine+" "+JukeBoxServer.fileDatabase.voteFor(inputLine,IPAddress));
 			}
@@ -137,7 +142,7 @@ public class JukeBoxMessageHandler implements Runnable
 								time = current;
 							}
 				
-							//System.out.println(data[0] + " >>> "+data[0]);
+							
 							fos.write(data[0]);
 						}
 						if (DEBUG) System.out.println("\nReceived "+Filename+" in "+((System.currentTimeMillis()-startTime)/1000)+" s");
@@ -147,20 +152,27 @@ public class JukeBoxMessageHandler implements Runnable
 						fos.close();
 						//Thread.sleep(60000);
 						//JukeBoxServer.postUpdate("",id);
+						try{
+							TagReader tr = new TagReader(f);
+					
+							JukeBoxServer.fileDatabase.addSong(new Song(Filename,username,tr.getArtist(),tr.getTitle()));
+							JukeBoxServer.fileDatabase.voteFor(Filename,IPAddress);
+						}catch(Exception e)
+						{
+							JukeBoxServer.fileDatabase.addSong(new Song(Filename,username,"Unknown",Filename));
+							JukeBoxServer.fileDatabase.voteFor(Filename,IPAddress);
+						}
 					}
 					catch(Exception ee)
 					{
 						ee.printStackTrace();
-						
+						f.delete();
 					}
 					finally
 					{
 						finishConnection();
 					}
-					TagReader tr = new TagReader(f);
 					
-					JukeBoxServer.fileDatabase.addSong(new Song(Filename,username,tr.getArtist(),tr.getTitle()));
-					JukeBoxServer.fileDatabase.voteFor(Filename,IPAddress);
 				}
 
 			}

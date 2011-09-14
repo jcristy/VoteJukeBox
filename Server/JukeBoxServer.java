@@ -17,6 +17,7 @@ public class JukeBoxServer
 	//public static final int MUSIC   = 4451;
 
 	//public static final String = "";
+	public static int VETOPERCENT = 51;
 	private static boolean listening = true;
 	private static JTextArea statusArea = new JTextArea(10,50);
 	private static JTextArea songDatabase = new JTextArea(10,50);
@@ -44,9 +45,10 @@ public class JukeBoxServer
 				for (int i=0; i<files.length; i++)
 				{
 					//fileDatabase.addSong(new Song(files[i].getName(),"","",""));
-					
-					TagReader tr = new TagReader(files[i]);
-					JukeBoxServer.fileDatabase.addSong(new Song(files[i].getName(),"",tr.getArtist(),tr.getTitle()));
+					try{
+						TagReader tr = new TagReader(files[i]);
+						JukeBoxServer.fileDatabase.addSong(new Song(files[i].getName(),"",tr.getArtist(),tr.getTitle()));
+					}catch(Exception e){}
 				}
 			}
 		});
@@ -77,7 +79,7 @@ public class JukeBoxServer
 						{
 							shutdown();
 						}
-						else if (command.equals("printsongs"))
+						else if (command.equals("listsongs"))
 						{
 							fileDatabase.printSongs();
 						}
@@ -124,6 +126,23 @@ public class JukeBoxServer
 		control.start();
 
 		musicPlayer.start();
+		
+		
+		Timer pruneUsers = new Timer();
+		pruneUsers.schedule(new TimerTask(){
+			public void run()
+			{	
+				for (int i=0; i<unique.size();i++)
+				{
+					if (unique.get(i).checkTimeout()){
+						unique.remove(i);
+						veto("");
+					}
+				}
+			}
+		},0,10000);//prune dead users every 10 seconds
+		
+		
 		//0 is reserved for the database
 		long thread_id = 10;
 		try{
@@ -149,17 +168,6 @@ public class JukeBoxServer
 				if (MessageServerSocket!=null) MessageServerSocket.close();
 			}catch(Exception e){e.printStackTrace();}
 		}
-		
-		Timer pruneUsers = new Timer();
-		pruneUsers.schedule(new TimerTask(){
-			public void run()
-			{
-				for (int i=0; i<unique.size();i++)
-				{
-					if (unique.get(i).checkTimeout()) unique.remove(i);
-				}
-			}
-		},0,10000);//prune dead users every 10 seconds
 	}
 	public static void pinged(String userIP)
 	{
@@ -173,10 +181,17 @@ public class JukeBoxServer
 	}
 	public static String veto(String userIP)//returns the number of vetoes and the number of votes necessary
 	{
-		for (int i=0; i<vetos.size();i++)
-			if (vetos.get(i).equals(userIP))
-				return ""+vetos.size()+"/"+unique.size();
-		vetos.add(userIP);
+		if (!userIP.equals(""))
+		{
+			pinged(userIP);
+			for (int i=0; i<vetos.size();i++)
+				if (vetos.get(i).equals(userIP))
+					return ""+vetos.size()+"/"+unique.size();
+			vetos.add(userIP);
+		}
+		double percentVetoed = vetos.size()/((double)unique.size());
+		if (percentVetoed*100>VETOPERCENT)
+			mp.nextSong();
 		return ""+vetos.size()+"/"+unique.size();
 	}
 	public static void clearVetoes()

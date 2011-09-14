@@ -13,6 +13,7 @@ import java.util.TimerTask;
 import java.util.Timer;
 import javax.swing.event.DocumentListener;
 import javax.swing.event.DocumentEvent;
+import javax.swing.Box;
 
 public class JukeBoxClient
 {
@@ -26,7 +27,7 @@ public class JukeBoxClient
 	public static JFrame mainframe;
 	public static JLabel server_address_lbl;
 	public static JTextField server_address_tf;
-	public static JLabel now_playing_lbl;
+	public static JLabel now_playing_label;
 	public static JButton veto_btn;
 	public static JSeparator separator;
 		public static JScrollPane database_song_table_scrollpane;
@@ -92,7 +93,7 @@ public class JukeBoxClient
 					config.createNewFile();
 				}catch(Exception e){}
 			}
-			server_address_tf = new JTextField(hostIP);
+			server_address_tf = new JTextField(hostIP,15);
 			server_address_tf.getDocument().addDocumentListener(new DocumentListener() {
 			  public void changedUpdate(DocumentEvent e) {
 			    change();
@@ -116,7 +117,7 @@ public class JukeBoxClient
 			  }
 			});
 			
-			now_playing_lbl = new JLabel("Now Playing");
+			now_playing_label = new JLabel("<html><h2>Now Playing</h2><br>Title:<br>Artist:<br>Votes:");
 			veto_btn = new JButton("VETO");
 			veto_btn.addActionListener(new ActionListener(){
 				public void actionPerformed(ActionEvent e)
@@ -131,9 +132,10 @@ public class JukeBoxClient
 			separator = new JSeparator();
 		
 			database_song_table = new JPanel();
-			GridLayout bl_database_table = new GridLayout(10,0);
+			int NUM_COLUMNS = 3;
+			GridLayout bl_database_table = new GridLayout(0,NUM_COLUMNS);
 			database_song_table.setLayout(bl_database_table);
-			for (int i=0; i<8; i++);	
+			for (int i=0; i<NUM_COLUMNS*10; i++);	
 				database_song_table.add(new JButton("You Shouldn't See This"));
 			
 			upload_song_panel = new JPanel();
@@ -170,17 +172,21 @@ public class JukeBoxClient
 			Container contentpane = mainframe.getContentPane();
 			BoxLayout bl = new BoxLayout(contentpane,BoxLayout.Y_AXIS);
 			contentpane.setLayout(bl);
-			contentpane.add(server_address_lbl);
-			contentpane.add(server_address_tf);
-			contentpane.add(now_playing_lbl);
+			JPanel ServerAddressLine = new JPanel();
+				BoxLayout bl_server_address = new BoxLayout(ServerAddressLine,BoxLayout.X_AXIS);
+				ServerAddressLine.setLayout(bl_server_address);
+				ServerAddressLine.add(server_address_lbl);
+				ServerAddressLine.add(server_address_tf);
+				ServerAddressLine.add(new JLabel(" "));
+			contentpane.add(ServerAddressLine);
+			contentpane.add(now_playing_label);
 			contentpane.add(veto_btn);
 			contentpane.add(separator);
-			database_song_table_scrollpane = new JScrollPane(database_song_table,ScrollPaneConstants.VERTICAL_SCROLLBAR_NEVER,ScrollPaneConstants.HORIZONTAL_SCROLLBAR_ALWAYS);
+			database_song_table_scrollpane = new JScrollPane(database_song_table,ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS,ScrollPaneConstants.HORIZONTAL_SCROLLBAR_ALWAYS);
 			contentpane.add(database_song_table_scrollpane);
 			contentpane.add(separator);
 			contentpane.add(upload_song_header_lbl);
 			contentpane.add(send_song_btn);
-			contentpane.add(separator);
 			contentpane.add(new JScrollPane(upload_statuses,ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS,ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER));
 			mainframe.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 			mainframe.pack();
@@ -224,24 +230,38 @@ public class JukeBoxClient
 				String inputLine = "";
 				while (!in.ready());
 				inputLine = in.readLine();
+				String artist = getValueFromXML("artist",inputLine);
+				String title  = getValueFromXML("title",inputLine);
+				String vetoes = getValueFromXML("vetoes",inputLine);
+				String users  = getValueFromXML("users",inputLine);
+				String votes  = getValueFromXML("votes",inputLine);
 				if ( database!=null)
 				{
-					now_playing_lbl.setText(inputLine);
+					now_playing_label.setText("<html><h2>Now Playing</h2> "+
+						"Title: "+title+"<br>"+
+						"Artist: "+artist+"<br>"+
+						"Votes/Users: "+votes+"/"+users);
+					veto_btn.setText("VETO "+vetoes+"/"+users);
 				}
 				else
 				{
-					System.out.println("Now Playing: "+inputLine);
+					System.out.println("Now Playing: "+title+" by "+artist+" ("+votes+"/"+users+")");
 				}
 				inputLine = in.readLine();
+				database.add(new JLabel("<HTML><b>Title</b><HTML>"));
+				database.add(new JLabel("<HTML><b>Artist</b><HTML>"));
+				database.add(new JLabel("<HTML><b>Votes</b><HTML>"));
 				while (!inputLine.contains("<END>"))
 				{
-					String artist = getValueFromXML("artist",inputLine);
-					String title  = getValueFromXML("title",inputLine);
+					artist = getValueFromXML("artist",inputLine);
+					title  = getValueFromXML("title",inputLine);
 					final String filename = getValueFromXML("filename",inputLine);
-					String votes = getValueFromXML("votes",inputLine);
+					votes = getValueFromXML("votes",inputLine);
 					if (database!=null)
 					{
-						final JButton voteFor = new JButton(title+" by "+artist+"("+votes+")");
+						final JButton voteFor = new JButton("VOTE ("+votes+")");
+						database.add(new JLabel(title));
+						database.add(new JLabel(artist));
 						database.add(voteFor);
 						voteFor.addActionListener(new ActionListener(){
 						public void actionPerformed(ActionEvent e)
@@ -265,7 +285,7 @@ public class JukeBoxClient
 				}
 				
 			}catch(Exception e){e.printStackTrace();}
-			if (database!=null) mainframe.validate();
+			if (database!=null) database.validate();
 		}
 		public String getValueFromXML(String tag, String xml)
 		{
@@ -394,7 +414,7 @@ public class JukeBoxClient
 						panel.add(progress);
 						progress.setValue(0);
 						progress.setString("Server has Maximum Connections, Please Wait");
-						mainframe.validate();
+						panel.validate();
 					}
 					else
 					{
@@ -421,7 +441,7 @@ public class JukeBoxClient
 							{
 								progress.setValue(Integer.parseInt(status.substring(0,status.indexOf(' '))));
 								progress.setString(f.getName()+" "+status.substring(status.indexOf(')')+1));
-								if (firsttime) mainframe.validate();
+								if (firsttime) panel.validate();
 								firsttime=false;
 							}
 						}
@@ -440,7 +460,7 @@ public class JukeBoxClient
 						public void mouseReleased (MouseEvent e){};
 						public void mouseExited (MouseEvent e){};
 					});
-						mainframe.validate();
+						panel.validate();
 					}
 					
 				}
@@ -454,6 +474,7 @@ public class JukeBoxClient
 							public void mouseClicked(MouseEvent e)
 							{
 								panel.remove(info);
+								panel.validate();
 							}
 							public void mousePressed (MouseEvent e){};
 							public void mouseEntered (MouseEvent e){};
@@ -461,7 +482,7 @@ public class JukeBoxClient
 							public void mouseExited (MouseEvent e){};
 						});
 						panel.add(info);
-						mainframe.validate();
+						panel.validate();
 					}
 				}			
 				//NOW SEND THE BYTES OF THE FILE

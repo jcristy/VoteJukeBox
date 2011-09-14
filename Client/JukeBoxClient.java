@@ -7,10 +7,12 @@ import javax.swing.*;
 //import javax.swing.filechooser.FileNameExtensionFilter;
 import java.awt.event.*;
 import java.awt.Container;
-import java.awt.FlowLayout;
+
 import java.awt.GridLayout;
 import java.util.TimerTask;
 import java.util.Timer;
+import javax.swing.event.DocumentListener;
+import javax.swing.event.DocumentEvent;
 
 public class JukeBoxClient
 {
@@ -34,6 +36,7 @@ public class JukeBoxClient
 	//public static 
 	
 	public static GetSongs gs;
+	public static Timer getSongs;
 	
 	public static void main(String[] args) 
 	{
@@ -71,7 +74,45 @@ public class JukeBoxClient
 		{
 			mainframe = new JFrame("VoteBox Client");
 			server_address_lbl = new JLabel("Server address:");
-			server_address_tf = new JTextField("172.31.53.101");
+			final File config = new File("config");
+			String hostIP = "";
+			if (config.exists())
+			{
+				try{
+					BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(config)));
+					hostIP = br.readLine();
+				}catch(Exception e){}
+			}
+			else
+			{
+				try{
+					config.createNewFile();
+				}catch(Exception e){}
+			}
+			server_address_tf = new JTextField(hostIP);
+			server_address_tf.getDocument().addDocumentListener(new DocumentListener() {
+			  public void changedUpdate(DocumentEvent e) {
+			    change();
+			  }
+			  public void removeUpdate(DocumentEvent e) {
+			    change();
+			  }
+			  public void insertUpdate(DocumentEvent e) {
+			    change();
+			  }
+			  public void change()
+			  {
+			  	try{
+			  		FileOutputStream fos = new FileOutputStream(config);
+				  	fos.write(server_address_tf.getText().getBytes());
+				}catch(Exception e){}
+			  	gs = new GetSongs(server_address_tf.getText(),database_song_table);
+			  	getSongs.cancel();
+				getSongs = new Timer();
+				getSongs.schedule(gs,0,5000);//loads song list every 5 seconds
+			  }
+			});
+			
 			now_playing_lbl = new JLabel("Now Playing");
 			separator = new JSeparator();
 		
@@ -132,7 +173,7 @@ public class JukeBoxClient
 			
 			mainframe.setVisible(true);
 			gs = new GetSongs(server_address_tf.getText(),database_song_table);
-			Timer getSongs = new Timer();
+			getSongs = new Timer();
 			getSongs.schedule(gs,0,5000);//loads song list every 5 seconds
 		}	 
 	}
@@ -181,7 +222,7 @@ public class JukeBoxClient
 				{
 					String artist = getValueFromXML("artist",inputLine);
 					String title  = getValueFromXML("title",inputLine);
-					String filename = getValueFromXML("filename",inputLine);
+					final String filename = getValueFromXML("filename",inputLine);
 					String votes = getValueFromXML("votes",inputLine);
 					if (database!=null)
 					{
@@ -191,7 +232,7 @@ public class JukeBoxClient
 						public void actionPerformed(ActionEvent e)
 						{
 								try{
-									Voter voter = new Voter(serverAddress, voteFor);
+									Voter voter = new Voter(serverAddress, filename);
 									Thread upload = new Thread(voter);
 									upload.start();
 								}catch(Exception ee){}					
@@ -209,7 +250,7 @@ public class JukeBoxClient
 				}
 				
 			}catch(Exception e){e.printStackTrace();}
-			if (database!=null) database.validate();
+			if (database!=null) mainframe.validate();
 		}
 		public String getValueFromXML(String tag, String xml)
 		{
@@ -322,7 +363,7 @@ public class JukeBoxClient
 				bos.write((f.getName()+"\n").getBytes());
 		
 				inputLine = in.readLine();
-				System.out.println(inputLine);
+				//System.out.println(inputLine);
 				final JProgressBar progress;
 				progress = new JProgressBar(0,100);
 				progress.setValue(0);

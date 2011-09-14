@@ -20,7 +20,9 @@ public class JukeBoxClient
 	public static final String NOMINATE = "NOMINATE";
 	public static final String VOTEFOR  = "VOTEFOR";
 	public static final String GETSONGS = "GETSONGS";
-	//public static final int MUSIC   = 4451;
+
+	public static int getsongs_rate = 5000;
+
 	public static JFrame mainframe;
 	public static JLabel server_address_lbl;
 	public static JTextField server_address_tf;
@@ -109,7 +111,7 @@ public class JukeBoxClient
 			  	gs = new GetSongs(server_address_tf.getText(),database_song_table);
 			  	getSongs.cancel();
 				getSongs = new Timer();
-				getSongs.schedule(gs,0,5000);//loads song list every 5 seconds
+				getSongs.schedule(gs,0,getsongs_rate);
 			  }
 			});
 			
@@ -174,7 +176,7 @@ public class JukeBoxClient
 			mainframe.setVisible(true);
 			gs = new GetSongs(server_address_tf.getText(),database_song_table);
 			getSongs = new Timer();
-			getSongs.schedule(gs,0,5000);//loads song list every 5 seconds
+			getSongs.schedule(gs,0,getsongs_rate);//loads song list every 5 seconds
 		}	 
 	}
 

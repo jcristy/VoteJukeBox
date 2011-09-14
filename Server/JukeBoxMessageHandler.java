@@ -44,6 +44,7 @@ public class JukeBoxMessageHandler implements Runnable
 			if (DEBUG) System.out.println("Action: "+inputLine);
 			if (inputLine.equals(GETSONGS))
 			{
+				JukeBoxServer.pinged(IPAddress);
 				os.println(JukeBoxServer.mp.nowPlaying.getFilename());
 				JukeBoxServer.fileDatabase.printSongs(os);
 				os.println("<END>");
@@ -52,7 +53,10 @@ public class JukeBoxMessageHandler implements Runnable
 			{
 				inputLine = JukeBoxServer.readALine(bis);
 				//System.out.println("VOTEFOR    "+inputLine);
-				os.println(inputLine+" "+JukeBoxServer.fileDatabase.voteFor(inputLine,IPAddress));
+				if (inputLine.equals("VETO"))
+					JukeBoxServer.veto(IPAddress);	
+				else
+					os.println(inputLine+" "+JukeBoxServer.fileDatabase.voteFor(inputLine,IPAddress));
 			}
 			else if (inputLine.equals(NOMINATE))
 			{

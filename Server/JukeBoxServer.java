@@ -3,6 +3,8 @@
 import java.net.*;
 import java.io.*;
 import java.util.ArrayList;
+import java.util.Timer;
+import java.util.TimerTask;
 import javax.swing.*;
 import java.awt.FlowLayout;
 
@@ -20,10 +22,14 @@ public class JukeBoxServer
 	private static JTextArea songDatabase = new JTextArea(10,50);
 	public static JFrame frame = new JFrame("JukeBox Server Status");
 	public static final MusicPlayer mp = new MusicPlayer(1);
+	public static ArrayList<String> vetos;
+	public static ArrayList<UserSession> unique;
 	
 	public static void main(String[] args)
 	{
 		//Try to Rebuild the database
+		vetos = new ArrayList<String>();
+		unique = new ArrayList<UserSession>();
 		Thread rebuildDatabase = new Thread(new Runnable(){
 			public void run()
 			{
@@ -96,6 +102,20 @@ public class JukeBoxServer
 						{
 							System.out.println(JukeBoxMessageHandler.numberOfConnectionsUnsafe());
 						}
+						else if (command.contains("listusers"))
+						{
+							for (int i=0; i<unique.size();i++)
+							{
+								System.out.println(i+": "+unique.get(i).getIP()+" "+(unique.get(i).checkTimeout()?"Timed Out":"Good"));
+							}
+						}
+						else if (command.contains("listvetoes"))
+						{
+							for (int i=0; i<vetos.size();i++)
+							{
+								System.out.println(i+": "+vetos.get(i));
+							}
+						}
 					}
 				}catch(Exception e){e.printStackTrace();}
 			}
@@ -130,6 +150,38 @@ public class JukeBoxServer
 			}catch(Exception e){e.printStackTrace();}
 		}
 		
+		Timer pruneUsers = new Timer();
+		pruneUsers.schedule(new TimerTask(){
+			public void run()
+			{
+				for (int i=0; i<unique.size();i++)
+				{
+					if (unique.get(i).checkTimeout()) unique.remove(i);
+				}
+			}
+		},0,10000);//prune dead users every 10 seconds
+	}
+	public static void pinged(String userIP)
+	{
+		for (int i=0; i<unique.size();i++)
+			if (unique.get(i).getIP().equals(userIP))
+			{
+				unique.get(i).pinged();
+				return;
+			}
+		unique.add(new UserSession(userIP,System.currentTimeMillis()));
+	}
+	public static String veto(String userIP)//returns the number of vetoes and the number of votes necessary
+	{
+		for (int i=0; i<vetos.size();i++)
+			if (vetos.get(i).equals(userIP))
+				return ""+vetos.size()+"/"+unique.size();
+		vetos.add(userIP);
+		return ""+vetos.size()+"/"+unique.size();
+	}
+	public static void clearVetoes()
+	{
+		vetos = new ArrayList<String>();
 	}
 	private static ArrayList<clientstatus> statuses = new ArrayList<clientstatus>();
 	public synchronized static void printStatuses()
@@ -173,7 +225,7 @@ public class JukeBoxServer
 			this.id = id;
 		}
 	}
-	public static void shutdown() throws IOException
+	public static void shutdown()
 	{
 		listening = false;
 		System.exit(0);

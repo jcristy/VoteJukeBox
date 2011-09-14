@@ -12,8 +12,11 @@ Server: '<filename>'<filename>'</filename>' '<artist>'<artist>'</artist>' '<titl
 ...repeats for all files in database
 
 =====if VOTEFOR======
-Client: <FILENAME>
-Server: <FILENAME> <VOTES>
+Client: <FILENAME/"VETO">
+	==if FILENAME==
+	Server: <FILENAME> <VOTES>
+	==if VETO==
+	Server: <vetos>/<votes needed>
 
 =====if NOMINATE=====
 Client: <FILENAME>

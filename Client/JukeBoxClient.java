@@ -27,6 +27,7 @@ public class JukeBoxClient
 	public static JLabel server_address_lbl;
 	public static JTextField server_address_tf;
 	public static JLabel now_playing_lbl;
+	public static JButton veto_btn;
 	public static JSeparator separator;
 		public static JScrollPane database_song_table_scrollpane;
 		public static JPanel database_song_table;
@@ -116,6 +117,17 @@ public class JukeBoxClient
 			});
 			
 			now_playing_lbl = new JLabel("Now Playing");
+			veto_btn = new JButton("VETO");
+			veto_btn.addActionListener(new ActionListener(){
+				public void actionPerformed(ActionEvent e)
+				{
+					try{
+						Voter voter = new Voter(server_address_tf.getText(), "VETO");
+						Thread upload = new Thread(voter);
+						upload.start();
+					}catch(Exception ee){}
+				}
+			});
 			separator = new JSeparator();
 		
 			database_song_table = new JPanel();
@@ -161,6 +173,7 @@ public class JukeBoxClient
 			contentpane.add(server_address_lbl);
 			contentpane.add(server_address_tf);
 			contentpane.add(now_playing_lbl);
+			contentpane.add(veto_btn);
 			contentpane.add(separator);
 			database_song_table_scrollpane = new JScrollPane(database_song_table,ScrollPaneConstants.VERTICAL_SCROLLBAR_NEVER,ScrollPaneConstants.HORIZONTAL_SCROLLBAR_ALWAYS);
 			contentpane.add(database_song_table_scrollpane);

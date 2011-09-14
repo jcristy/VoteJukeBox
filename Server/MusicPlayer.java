@@ -70,6 +70,7 @@ public class MusicPlayer implements Runnable
 				//System.out.println("Done playing");
 				//while (!player.isComplete())
 				nowPlaying.clearVotes();
+				JukeBoxServer.clearVetoes();
 				JukeBoxServer.fileDatabase.postUpdate();
 				player.close();
 			}catch(Exception e){e.printStackTrace();}

@@ -13,6 +13,7 @@ public class GetSongs extends TimerTask
 		int sortBy = 0;
 		ButtonGroup group;
 		JRadioButton artist_radio,title_radio,votes_radio;
+		ArrayList<Song> songs;
 		public GetSongs(String address, JPanel db)
 		{
 			serverAddress = address;
@@ -60,7 +61,7 @@ public class GetSongs extends TimerTask
 				}
 				inputLine = in.readLine();
 				
-				ArrayList<Song> songs = new ArrayList<Song>();
+				songs = new ArrayList<Song>();
 				if (group == null)
 				{
 					group = new ButtonGroup();

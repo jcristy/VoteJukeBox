@@ -22,7 +22,6 @@ public class UploadSong implements Runnable
 	}
 	public void run()
 	{
-		System.out.println("upload song");
 		Socket toServer;
 		try{
 			toServer = new Socket(serverAddress,JukeBoxClient.MESSAGE);	
@@ -85,7 +84,7 @@ public class UploadSong implements Runnable
 					if (in.ready())
 					{
 						String status = in.readLine();
-						System.out.print("\r"+status);
+						//System.out.print("\r"+status);
 						if (panel!=null)
 						{
 							progress.setValue(Integer.parseInt(status.substring(0,status.indexOf(' '))));
@@ -103,6 +102,7 @@ public class UploadSong implements Runnable
 					public void mouseClicked(MouseEvent e)
 					{
 						panel.remove(progress);
+						panel.validate();
 					}
 					public void mousePressed (MouseEvent e){};
 					public void mouseEntered (MouseEvent e){};

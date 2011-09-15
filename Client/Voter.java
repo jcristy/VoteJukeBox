@@ -47,10 +47,17 @@ public class Voter implements Runnable
 			//Wait for Response			
 			while (!in.ready());
 			inputLine = in.readLine();
+			String artist = getValueFromXML("artist",inputLine);
+			String title  = getValueFromXML("title",inputLine);
+			String votes  = getValueFromXML("votes",inputLine);
+			String album  = getValueFromXML("album",inputLine);
+			String year   = getValueFromXML("year",inputLine);
+			JukeBoxClient.song_database.addOrUpdate(new Song(title,artist,votes,filename,album,year));
+			JukeBoxClient.song_database.fillThis();
 			if (button!=null)
 			{
 				//System.out.println(inputLine);
-				button.setText("Vote For "+inputLine);
+				//button.setText("Vote For "+inputLine);
 			}
 			else
 			{
@@ -58,5 +65,14 @@ public class Voter implements Runnable
 			}
 		}catch(Exception e){e.printStackTrace();}
 	}
+	public String getValueFromXML(String tag, String xml)
+	{
+		int begin;
+		int end;
+		begin = xml.indexOf("<"+tag+">")+tag.length()+2;
+		end   = xml.indexOf("</"+tag+">");
+		return xml.substring(begin,end);
+	}
+
 }
 

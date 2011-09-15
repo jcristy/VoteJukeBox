@@ -38,6 +38,7 @@ public class JukeBoxClient
 	
 	public static GetSongs gs;
 	public static Timer getSongs;
+	public static SongDatabase song_database;
 	
 	public static void main(String[] args) 
 	{
@@ -73,6 +74,7 @@ public class JukeBoxClient
 		}
 		else //WITH GUI
 		{
+
 			mainframe = new JFrame("VoteBox Client");
 			server_address_lbl = new JLabel("Server address:");
 			final File config = new File("config");
@@ -130,11 +132,12 @@ public class JukeBoxClient
 			separator = new JSeparator();
 		
 			database_song_table = new JPanel();
-			int NUM_COLUMNS = 3;
+			int NUM_COLUMNS = 4;
 			GridLayout bl_database_table = new GridLayout(0,NUM_COLUMNS);
 			database_song_table.setLayout(bl_database_table);
 			for (int i=0; i<NUM_COLUMNS*10; i++);	
 				database_song_table.add(new JButton("You Shouldn't See This"));
+			song_database = new SongDatabase(database_song_table);
 			
 			upload_song_panel = new JPanel();
 			upload_song_header_lbl = new JLabel("Upload Files");
@@ -195,5 +198,9 @@ public class JukeBoxClient
 			getSongs = new Timer();
 			getSongs.schedule(gs,0,getsongs_rate);//loads song list every 5 seconds
 		}	 
+	}
+	public static String getServerAddress()
+	{
+		return	server_address_tf.getText();
 	}
 }

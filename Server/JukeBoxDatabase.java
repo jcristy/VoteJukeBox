@@ -77,20 +77,27 @@ public class JukeBoxDatabase
 			out.println();
 		}
 	}
-	public int voteFor(String filename,String IPAddress)
+	public String voteFor(String filename,String IPAddress)
 	{
 		for (int i=0; i<Songs.size();i++)
 		{
 			//System.out.println("Does <" + Songs.get(i).getFilename() + ">==<" + filename+">");
 			if (Songs.get(i).getFilename().equals(filename))
 			{
-				int temp = Songs.get(i).voteFor(IPAddress);
+				Songs.get(i).voteFor(IPAddress);
 				//System.out.println("Now we have this many votes: "+temp);
 				postUpdate();
-				return temp;
-			}
+				return "<song>"+
+					"<filename>"+Songs.get(i).getFilename()+"</filename>"+
+					"<artist>"+Songs.get(i).getArtist()+"</artist>"+
+					"<title>"+Songs.get(i).getTitle()+"</title>"+
+					"<votes>"+Songs.get(i).getVotes()+"</votes>"+
+					"<album>"+Songs.get(i).getAlbum()+"</album>"+
+					"<year>"+Songs.get(i).getYear()+"</year>"+
+					"</song>";
+			}	
 		}
 		//postUpdate();
-		return -1;
+		return "";
 	}
 }

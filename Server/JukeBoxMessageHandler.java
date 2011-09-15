@@ -45,12 +45,16 @@ public class JukeBoxMessageHandler implements Runnable
 			if (inputLine.equals(GETSONGS))
 			{
 				JukeBoxServer.pinged(IPAddress);
-				os.println("<filename>"+JukeBoxServer.mp.nowPlaying.getFilename()+"</filename>"
+				os.println("<nowplaying>"
+				+"<filename>"+JukeBoxServer.mp.nowPlaying.getFilename()+"</filename>"
 				+"<artist>"+JukeBoxServer.mp.nowPlaying.getArtist()+"</artist>"
 				+"<title>"+JukeBoxServer.mp.nowPlaying.getTitle()+"</title>"
 				+"<vetoes>"+JukeBoxServer.vetos.size()+"</vetoes>"
 				+"<users>"+JukeBoxServer.unique.size()+"</users>"
-				+"<votes>"+JukeBoxServer.mp.nowPlaying.getVotes()+"</votes>");
+				+"<votes>"+JukeBoxServer.mp.nowPlaying.getVotes()+"</votes>"
+				+"<album>"+JukeBoxServer.mp.nowPlaying.getAlbum()+"</album>"
+				+"<year>"+JukeBoxServer.mp.nowPlaying.getYear()+"</year>"
+				+"</nowplaying>");
 				JukeBoxServer.fileDatabase.printSongs(os);
 				os.println("<END>");
 			}
@@ -61,7 +65,7 @@ public class JukeBoxMessageHandler implements Runnable
 				if (inputLine.equals("VETO"))
 					os.println("VETO "+JukeBoxServer.veto(IPAddress));
 				else
-					os.println(inputLine+" "+JukeBoxServer.fileDatabase.voteFor(inputLine,IPAddress));
+					os.println(JukeBoxServer.fileDatabase.voteFor(inputLine,IPAddress));
 			}
 			else if (inputLine.equals(NOMINATE))
 			{

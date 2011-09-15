@@ -157,6 +157,24 @@ public class TagReader {
 			return "";
 		}
 	}
+	public String getYear(){
+		if(tagsValid()){
+			if(tagHasArtistTitle()){
+				if(has_v2_tag){
+					return tag_v2.getFirst(ID3v24Frames.FRAME_ID_YEAR);
+				}
+				else{
+					return tag_v1.getYear().get(0).toString();
+				}
+			}
+			else{
+				return "";
+			}
+		}
+		else{
+			return "";
+		}
+	}
 	
 	public String getArtistTitleName(){
 		if(tagHasArtistTitle()){

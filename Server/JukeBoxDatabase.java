@@ -58,7 +58,7 @@ public class JukeBoxDatabase
 	{
 		for (int i=0; i<Songs.size();i++)
 		{
-			System.out.println(Songs.get(i).getFilename()+" votes:"+Songs.get(i).getVotes()+" title:"+Songs.get(i).getTitle()+" artist:"+Songs.get(i).getArtist());
+			System.out.println(Songs.get(i).getFilename()+" votes:"+Songs.get(i).getVotes()+" title:"+Songs.get(i).getTitle()+" artist:"+Songs.get(i).getArtist()+" album:"+Songs.get(i).getAlbum()+"("+Songs.get(i).getYear()+")");
 		}
 	}
 	public void printSongs(PrintWriter out)
@@ -71,6 +71,8 @@ public class JukeBoxDatabase
 			out.print("<artist>"+Songs.get(i).getArtist()+"</artist>");
 			out.print("<title>"+Songs.get(i).getTitle()+"</title>");
 			out.print("<votes>"+Songs.get(i).getVotes()+"</votes>");
+			out.print("<album>"+Songs.get(i).getAlbum()+"</album>");
+			out.print("<year>"+Songs.get(i).getYear()+"</year>");
 			out.print("</song>");
 			out.println();
 		}

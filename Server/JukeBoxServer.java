@@ -49,7 +49,7 @@ public class JukeBoxServer
 					//fileDatabase.addSong(new Song(files[i].getName(),"","",""));
 					try{
 						TagReader tr = new TagReader(files[i]);
-						JukeBoxServer.fileDatabase.addSong(new Song(files[i].getName(),"",tr.getArtist(),tr.getTitle()));
+						JukeBoxServer.fileDatabase.addSong(new Song(files[i].getName(),"",tr.getArtist(),tr.getTitle(),tr.getAlbum(),tr.getYear()));
 					}catch(Exception e){}
 				}
 			}

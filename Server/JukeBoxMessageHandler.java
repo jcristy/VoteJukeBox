@@ -155,11 +155,11 @@ public class JukeBoxMessageHandler implements Runnable
 						try{
 							TagReader tr = new TagReader(f);
 					
-							JukeBoxServer.fileDatabase.addSong(new Song(Filename,username,tr.getArtist(),tr.getTitle()));
+							JukeBoxServer.fileDatabase.addSong(new Song(Filename,username,tr.getArtist(),tr.getTitle(),tr.getAlbum(),tr.getYear()));
 							JukeBoxServer.fileDatabase.voteFor(Filename,IPAddress);
 						}catch(Exception e)
 						{
-							JukeBoxServer.fileDatabase.addSong(new Song(Filename,username,"Unknown",Filename));
+							JukeBoxServer.fileDatabase.addSong(new Song(Filename,username,"Unknown",Filename,"Unknown"," "));
 							JukeBoxServer.fileDatabase.voteFor(Filename,IPAddress);
 						}
 					}

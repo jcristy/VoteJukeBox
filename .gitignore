@@ -4,3 +4,4 @@ Server/*.jar
 Client/*.class
 Client/*.jar
 Server/uploads/
+Client/config

@@ -11,7 +11,7 @@ public class SongDatabase
 	ArrayList<Song> songs;
 	int[] sortBy = {Song.ARTIST,Song.YEAR,Song.ALBUM,Song.TITLE};
 	JPanel panel;
-	JRadioButton artist_radio,album_radio,title_radio,votes_radio;
+	JRadioButton artist_radio,album_radio,title_radio,votes_radio,year_radio;
 	ButtonGroup group;
 	public SongDatabase(JPanel panel)
 	{
@@ -106,6 +106,11 @@ public class SongDatabase
 			album_radio.setToolTipText("Sort by album");
 			group.add(album_radio);
 			album_radio.setActionCommand(""+Song.ALBUM);
+			
+			year_radio = new JRadioButton("<HTML><b>Year</b><HTML>");
+			year_radio.setToolTipText("Sort by year");
+			group.add(year_radio);
+			year_radio.setActionCommand(""+Song.YEAR);
 									
 			votes_radio = new JRadioButton("<HTML><b>Votes</b><HTML>");
 			votes_radio.setToolTipText("Sort by votes");
@@ -124,11 +129,15 @@ public class SongDatabase
 			title_radio.addActionListener(sort_listener);
 			artist_radio.addActionListener(sort_listener);
 			votes_radio.addActionListener(sort_listener);
+			year_radio.addActionListener(sort_listener);
 			album_radio.addActionListener(sort_listener);
 		}
 		panel.add(title_radio);
 		panel.add(artist_radio);
-		panel.add(album_radio);
+		JPanel comboPanel = new JPanel();
+			comboPanel.add(album_radio);
+			comboPanel.add(year_radio);
+		panel.add(comboPanel);
 		panel.add(votes_radio);
 		//END ALWAYS THE SAME
 		for (int i=0; i<sorted.size();i++)

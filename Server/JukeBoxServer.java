@@ -5,6 +5,7 @@ import java.io.*;
 import java.util.ArrayList;
 import java.util.Timer;
 import java.util.TimerTask;
+import java.util.Enumeration;
 import javax.swing.*;
 import java.awt.FlowLayout;
 
@@ -19,6 +20,7 @@ public class JukeBoxServer
 	//public static final String = "";
 	public static int VETOPERCENT = 51;
 	private static boolean listening = true;
+	private static JLabel ipAddress;
 	private static JTextArea statusArea = new JTextArea(10,50);
 	private static JTextArea songDatabase = new JTextArea(10,50);
 	public static JFrame frame = new JFrame("JukeBox Server Status");
@@ -56,6 +58,27 @@ public class JukeBoxServer
 		//Continue
 		FlowLayout fl = new FlowLayout();
 		frame.getContentPane().setLayout(fl);
+		try{
+			Enumeration<NetworkInterface> enu = NetworkInterface.getNetworkInterfaces();
+			String toShow = "<HTML>";
+			for (; enu.hasMoreElements();)
+			{
+				NetworkInterface thisone = enu.nextElement();
+				Enumeration<InetAddress> enu2 = thisone.getInetAddresses();
+				toShow = toShow + ("<b>"+thisone.getName()+":</b><br>");
+				for (; enu2.hasMoreElements();)
+				{
+					InetAddress thisAddress = enu2.nextElement();
+					toShow = toShow +" "+ thisAddress.toString()+"<br>";
+				}
+       				
+       			}
+       			ipAddress = new JLabel(toShow+"</HTML>");
+		}catch(Exception e){
+			ipAddress = new JLabel("Host Unknown");
+		}
+		
+		frame.getContentPane().add(ipAddress);
 		frame.getContentPane().add(new JScrollPane(songDatabase));
 		frame.getContentPane().add(new JScrollPane(statusArea));
 		frame.pack();
